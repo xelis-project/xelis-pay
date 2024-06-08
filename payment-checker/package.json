@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "@xelis/sdk": "^0.9.7",
+    "dotenv": "^16.4.5",
+    "nanoid": "^5.0.7"
+  }
+}

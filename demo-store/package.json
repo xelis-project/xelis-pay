@@ -1,0 +1,19 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.js --loader:.js=jsx --outdir=www/build --bundle --minify",
+    "start": "node dev.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "bootstrap": "^5.3.3",
+    "express": "^4.19.2",
+    "nanoid": "^5.0.7",
+    "react": "^18.3.1",
+    "react-router-dom": "^6.23.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.4"
+  }
+}
