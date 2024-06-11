@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@xelis/sdk": "^0.9.8",
     "goober": "^2.1.14",
     "qrcode": "^1.5.3",
     "qrcode.react": "^3.1.0",

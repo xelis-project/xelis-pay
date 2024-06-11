@@ -182,7 +182,7 @@ function Payments() {
 function Page() {
   return <div className="container">
     <h1 className="mt-3">Demo Store</h1>
-    <div className="w-50">This is a demo store using the <span className="badge text-bg-secondary">XEL Pay plugin</span>. Let's pretend this is a portal to buy a new games from an indie game studio.</div>
+    <div className="w-50">This is a demo store using the <span className="badge text-bg-secondary">XELIS Pay</span>. Let's pretend this is a portal to buy a new games from an indie game studio.</div>
     <Games />
     <Payments />
     <SupportModal />

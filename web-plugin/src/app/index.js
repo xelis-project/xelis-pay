@@ -1,280 +1,14 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { css, keyframes } from 'goober'
+import React, { useCallback, useEffect, useState } from 'react'
 import { QRCodeCanvas } from 'qrcode.react'
+import { WS as XSWD } from '@xelis/sdk/xswd/websocket'
+import { XELIS_ASSET, LOCAL_XSWD_WS } from '@xelis/sdk/config'
 
 import { useXelisPay } from '../provider'
-import { IconArrowDown, IconBan, IconCircleCheck, IconCircleQuestion, IconCopy, IconInfo, IconXelis } from './icons'
-
-const anim = {
-  enter: keyframes`
-    from {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  `,
-  leave: keyframes`
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-  `,
-  scalePulse: keyframes`
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(.9);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  `,
-  opacityPulse: keyframes`
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-    100% {
-      opacity: 1;
-    }
-  `,
-  floating: keyframes`
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  `
-}
-
-const style = {
-  backdrop: css`
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgb(0 0 0 / 50%);
-  `,
-  layout: css`
-    position: fixed;
-    width: 100%;
-    top: 0;
-    bottom: 0;
-    z-index: 9999999999999999999;
-    padding: 1rem;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    display: flex;
-    align-items: start;
-    justify-content: center;
-
-    @media only screen and (min-height: 650px) {
-      align-items: center;
-    }
-  `,
-  app: css`
-    /*background-color: #7afad3;*/
-    background-color: rgb(18 132 103);
-    box-shadow: 0 0 40px 0px #2f2f2f;
-    padding: 2rem;
-    border-radius: 15px;
-    opacity: 0;
-    transform: translateY(-100%);
-    width: 100%;
-    overflow: hidden;
-    color: white;
-
-    @media only screen and (min-width: 400px) {
-      max-width: 350px;
-    }
-  `,
-  appEnter: css`
-    animation: ${anim.enter} .25s forwards ease-out;
-  `,
-  appLeave: css`
-    animation: ${anim.leave} .25s forwards ease-in;
-  `,
-  header: css`
-    display: flex;
-    gap: 3rem;
-    align-items: center;
-    justify-content: center;
-  `,
-  todoMsg: css`
-    text-align: center;
-    font-size: 1.2rem;
-    line-height: 1.3rem;
-    max-width: 250px;
-    margin: 1em auto;
-  `,
-  amount: css`
-    font-weight: bold;
-    font-size: 1.4rem;
-  `,
-  qrCode: css`
-    display: flex;
-    justify-content: center;
-  
-    > canvas {
-      background-color: black;
-      border-radius: 1em;
-      padding: 1em;
-    }
-  `,
-  waitStore: css`
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    max-width: 250px;
-    margin: 2em auto;
-    line-height: 1rem;
-    font-size: 1rem;
-
-    animation: ${anim.opacityPulse} 2s infinite;
-  `,
-  cancel: css`
-    display: flex;
-    justify-content: center;
-  `,
-  actionButton: css`
-    display: flex;
-    gap: .5rem;
-    background-color: black;
-    border-radius: 1rem;
-    border: none;
-    color: white;
-    padding: .3rem .85rem;
-    font-weight: bold;
-    align-items: center;
-    transition: all .25s;
-    text-decoration: none;
-    cursor: pointer;
-
-    &:hover {
-      transform: scale(.95);
-    }
-
-    > svg {
-      width: 1rem;
-      height: 1rem;
-    }  
-  `,
-  timer: css`
-    display: flex;
-    justify-content: center;
-
-    > div {
-      background: black;
-      padding: .25rem 1rem 0 1rem;
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
-      position: relative;
-      top: .5rem;
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: white;
-    }
-  `,
-  headerIconButton: css`
-    background: none;
-    width: 2.5rem;
-    height: 2.5rem;
-    border: none;
-    cursor: pointer;
-    transition: all .25s;
-
-    &:hover {
-      transform: scale(.95);
-    }
-  `,
-  dotPulse: css`
-    min-width: 1.5rem;
-    min-height: 1.5rem;
-    max-width: 1.5rem;
-    max-height: 1.5rem;
-    background-color: black;
-    border-radius: 50%;
-    animation: ${anim.scalePulse} 2s infinite;
-  `,
-  statusTitle: css`
-    font-weight: bold;
-    font-size: 1.4rem;
-    margin-bottom: .25rem;
-  `,
-  statusMsg: css`
-    line-height: 1.2rem;
-  `,
-  statusActions: css`
-    display: flex;
-    gap: .5rem;
-    margin-top: 1rem;
-  `,
-  complete: css`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  `,
-  completeTitle: css`
-    font-weight: bold;
-    font-size: 2rem;
-  `,
-  completeIcon: css`
-    width: 7rem;
-    height: 7rem;
-    margin: 1rem 0;
-  `,
-  completeMsg: css`
-    text-align: center;
-    margin-bottom: 2rem;
-    line-height: 1.3rem;
-    max-width: 250px;
-  `,
-  xelisBackdrop: css`
-    position: absolute;
-    width: 200%;
-    top: -10%;
-    left: -70%;
-    opacity: 0.04;
-    color: white;
-    animation: ${anim.floating} 5s ease-in-out infinite;
-  `,
-  container: css`
-    position: relative;
-  `,
-  dotsBackground: css`
-    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="2" fill="black"/></svg>') repeat;
-    background-size: 5px 5px;
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    opacity: .05;
-    top: 0;
-    left: 0;
-  `,
-  xswd: css`
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1em;
-  `
-}
+import {
+  IconArrowDown, IconBan, IconCircleCheck, IconCircleQuestion,
+  IconCopy, IconInfo, IconXelis, IconClose
+} from './icons'
+import style from './style'
 
 function Timer(props) {
   const { duration } = props
@@ -304,9 +38,15 @@ function WaitingForPayment() {
   const { paymentData, cancelTransfer } = useXelisPay()
   const { id, ttl, addr, amount } = paymentData || {}
 
+  const [showInfo, setShowInfo] = useState(false)
+
   const copy = useCallback(() => {
     navigator.clipboard.writeText(addr)
     alert("The payment address was copied to clipboard.")
+  }, [])
+
+  const info = useCallback(() => {
+    setShowInfo(true)
   }, [])
 
   const cancel = useCallback(() => {
@@ -316,41 +56,69 @@ function WaitingForPayment() {
     cancelTransfer()
   }, [cancelTransfer])
 
-  const connectXSWD = useCallback(() => {
-    // TODO
-  }, [])
+  const connectXSWD = useCallback(async () => {
+    let xswd = null
 
-  return <div>
-    <div className={style.header}>
-      <button className={style.headerIconButton} onClick={copy} title="Copy receiving address to clipboard.">
+    try {
+      xswd = new XSWD()
+      await xswd.connect(LOCAL_XSWD_WS)
+
+      await xswd.authorize({
+        id: `9F86D081884C7D659A2FEAA0C55AD015A3BF4F1B2B0B822CD15D6C15B0F00A08`,
+        name: `XELIS Pay`,
+        description: ``,
+        permissions: new Map()
+      })
+
+      const atomicAmount = Math.trunc(amount * 100000000)
+      await xswd.wallet.buildTransaction({
+        transfers: [{
+          amount: atomicAmount, // in atomic value
+          asset: XELIS_ASSET,
+          destination: addr
+        }],
+        broadcast: true
+      })
+
+      xswd.close()
+    } catch (err) {
+      console.log(err)
+      xswd.close()
+    }
+  }, [addr, amount])
+
+  return <div className={style.waitPayment.container}>
+    {showInfo && <Info onClose={() => setShowInfo(false)} />}
+    <div className={style.waitPayment.header}>
+      <button className={style.waitPayment.headerIconButton} onClick={copy} title="Copy receiving address to clipboard.">
         <IconCopy />
       </button>
-      <div className={style.amount}>{amount} XEL</div>
-      <button className={style.headerIconButton} title="More information about this proccess.">
+      <div className={style.waitPayment.amount}>{amount} XEL</div>
+      <button className={style.waitPayment.headerIconButton} onClick={info} title="More information about this entire proccess.">
         <IconInfo />
       </button>
     </div>
-    <div className={style.todoMsg}>
+    <div className={style.waitPayment.todoMsg}>
       Copy the address, scan the QR code, or use XSWD to send the amount.
     </div>
-    <div className={style.xswd}>
-      <button className={style.actionButton} onClick={connectXSWD}>
+    <div className={style.waitPayment.xswd}>
+      <button className={style.button} onClick={connectXSWD}>
         <IconArrowDown style={{ transform: `rotate(270deg)` }} />
         Use XSWD
       </button>
     </div>
-    <div className={style.timer}>
+    <div className={style.waitPayment.timer}>
       <div><Timer duration={5 * 60} /></div>
     </div>
-    <div className={style.qrCode}>
+    <div className={style.waitPayment.qrCode}>
       <QRCodeCanvas value={addr} size={200} />
     </div>
-    <div className={style.waitStore}>
-      <div className={style.dotPulse}></div>
+    <div className={style.waitPayment.waitForStore}>
+      <div className={style.waitPayment.dotPulse}></div>
       <div>Waiting for store to confirm your transaction...</div>
     </div>
-    <div className={style.cancel}>
-      <button className={style.actionButton} onClick={cancel}>
+    <div className={style.waitPayment.cancel}>
+      <button className={style.button} onClick={cancel}>
         <IconBan />
         Cancel
       </button>
@@ -367,15 +135,15 @@ function Status(props) {
     cancelTransfer()
   }, [])
 
-  return <div>
-    <div className={style.statusTitle}>{title}</div>
-    <div className={style.statusMsg}>{msg}</div>
-    <div className={style.statusActions}>
-      {displaySupport && <button onClick={support} className={style.actionButton}>
+  return <div className={style.status.container}>
+    <div className={style.status.title}>{title}</div>
+    <div className={style.status.msg}>{msg}</div>
+    <div className={style.status.actions}>
+      {displaySupport && <button onClick={support} className={style.button}>
         <IconCircleQuestion />
         Support
       </button>}
-      <button onClick={cancelTransfer} className={style.actionButton}>
+      <button onClick={cancelTransfer} className={style.button}>
         <IconArrowDown />
         Close
       </button>
@@ -392,14 +160,64 @@ function Complete() {
     cancelTransfer()
   }, [])
 
-  return <div className={style.complete}>
-    <div className={style.completeTitle}>Success</div>
-    <div className={style.completeIcon}><IconCircleCheck /></div>
-    <div className={style.completeMsg}>The payment was received and confirmed by the store.</div>
-    <button className={style.actionButton} onClick={complete}>
+  return <div className={style.complete.container}>
+    <div className={style.complete.title}>Success</div>
+    <div className={style.complete.icon}><IconCircleCheck /></div>
+    <div className={style.complete.msg}>The payment was received and confirmed by the store.</div>
+    <button className={style.button} onClick={complete}>
       <IconArrowDown style={{ transform: `rotate(270deg)` }} />
       Continue
     </button>
+  </div>
+}
+
+function Info(props) {
+  const { onClose } = props
+
+  return <div className={style.info.container}>
+    <div className={style.info.header.container}>
+      <div className={style.info.header.title}>Info</div>
+      <button onClick={onClose} className={style.info.header.button}>
+        <IconClose />
+      </button>
+    </div>
+    <div className={style.info.content}>
+      <p>
+        XELIS Pay is a trusted setup. The store provides an integrated address for you to send funds and pay for the product / service.
+        There is usually a 5 minute window for the entire transaction to be fulfilled by the store.
+        You should NOT cancel an ongoing process if you sent a transaction.
+      </p>
+      <p>
+        Try to keep the window open in order to receive feedback of a fulfilled transaction. However, if you close the window
+        and sent a transaction, it can still be validated by the store, but you will not receive any feedback from this plugin.
+        Same goes if you loose power / connection or your computer does not respond for whatever reasons.
+      </p>
+      <p>
+        Do NOT send a transaction without giving enough time for the network & store to validate within the process time window.
+      </p>
+      <p>Here are multiple ways you can send funds:</p>
+      <div>Copy address:</div>
+      <ul>
+        <li>Copy the integrated address with the copy button.</li>
+        <li>Paste the address in the wallet and enter the needed amount.</li>
+        <li>Send the transaction.</li>
+      </ul>
+      <div>Scan the QR code:</div>
+      <ul>
+        <li>Scan the QR code with the wallet.</li>
+        <li>Enter the needed amount.</li>
+        <li>Send the transaction.</li>
+      </ul>
+      <div>Use the XSWD protocol:</div>
+      <ul>
+        <li>Click `Use XSWD` to connect to the wallet.</li>
+        <li>Authorize the app and transfer within the wallet.</li>
+      </ul>
+      <p>
+        Again, this is a trusted setup, make sure the store is legit and trusted.
+        Use at your own risk.
+      </p>
+    </div>
   </div>
 }
 
@@ -465,7 +283,7 @@ function App() {
       <div className={style.xelisBackdrop}>
         <IconXelis />
       </div>
-      <div className={style.container}>
+      <div className={style.appContainer}>
         <Container />
       </div>
     </div>
