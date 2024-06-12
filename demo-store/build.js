@@ -2,8 +2,13 @@ import esbuild from 'esbuild'
 import path from 'path'
 import { spawn } from 'child_process'
 
+const args = process.argv.slice(2)
+
+let dev = args.includes(`--dev`)
+let watch = args.includes(`--watch`)
+
 const buildClient = async () => {
-  const ctx = await esbuild.context({
+  const options = {
     entryPoints: ['./client/index.js'],
     bundle: true,
     outfile: './public/build/bundle.js',
@@ -15,13 +20,19 @@ const buildClient = async () => {
     alias: {
       'react': path.resolve('./node_modules/react') // fix because we are using react in the other web-plugin project https://blog.maximeheckel.com/posts/duplicate-dependencies-npm-link/
     },
-    sourcemap: `inline`
-  })
+    minify: !dev,
+    sourcemap: dev ? `inline` : false
+  }
 
-  await ctx.watch()
+  if (watch) {
+    const ctx = await esbuild.context(options)
+    await ctx.watch()
+  } else {
+    await esbuild.build(options)
+  }
 }
 
-const startServer = async () => {
+const startDevServer = async () => {
   const process = spawn(`node`, [`./server/index.js`])
 
   process.stdout.on('data', (data) => {
@@ -41,4 +52,4 @@ const startServer = async () => {
 }
 
 buildClient()
-startServer()
+if (watch) startDevServer()
