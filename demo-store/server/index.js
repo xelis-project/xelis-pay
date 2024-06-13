@@ -6,7 +6,8 @@ import database from './db.js'
 import apiPayments from './api/payments.js'
 
 const app = express()
-const port = 48766
+const port = process.env.PORT || 3000
+const hostname = process.env.HOSTNAME || `127.0.0.1`
 
 app.use(bodyParser.json())
 
@@ -19,6 +20,6 @@ app.use(`*`, (req, res) => {
   res.sendFile(path.resolve(`./public/index.html`))
 })
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`)
+app.listen(port, hostname, () => {
+  console.log(`Server is running on http://${hostname}:${port}`)
 })

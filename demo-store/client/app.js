@@ -145,7 +145,7 @@ function Payments() {
     fetchPayments()
   }, [])
 
-  return <div className="table-responsive">
+  return <div>
     <h2 className="my-3 d-flex justify-content-between">
       Payments
       <button className="btn btn-secondary" onClick={fetchPayments}>
@@ -153,36 +153,41 @@ function Payments() {
         <span>Reload</span>
       </button>
     </h2>
-    <table className="table table-bordered">
-      <thead className="thead-dark">
-        <tr>
-          <th>Product ID</th>
-          <th>Amount</th>
-          <th>Transaction ID</th>
-          <th>Timestamp</th>
-        </tr>
-      </thead>
-      <tbody>
-        {list.map((item) => {
-          return <tr key={item.id}>
-            <td>{item.product_id}</td>
-            <td>{item.amount}</td>
-            <td>{item.tx_id}</td>
-            <td>{item.timestamp}</td>
+    <div className="table-responsive">
+      <table className="table table-bordered">
+        <thead className="thead-dark">
+          <tr>
+            <th>Product ID</th>
+            <th>Amount</th>
+            <th>Transaction ID</th>
+            <th>Timestamp</th>
           </tr>
-        })}
-        {list.length === 0 && <tr>
-          <td colSpan={4}>No payments</td>
-        </tr>}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {list.map((item) => {
+            return <tr key={item.id}>
+              <td>{item.product_id}</td>
+              <td>{item.amount}</td>
+              <td>{item.tx_id}</td>
+              <td>{item.timestamp}</td>
+            </tr>
+          })}
+          {list.length === 0 && <tr>
+            <td colSpan={4}>No payments</td>
+          </tr>}
+        </tbody>
+      </table>
+    </div>
   </div>
 }
 
 function Page() {
   return <div className="container">
     <h1 className="mt-3">Demo Store</h1>
-    <div className="w-50">This is a demo store using the <span className="badge text-bg-secondary">XELIS Pay</span>. Let's pretend this is a portal to buy a new games from an indie game studio.</div>
+    <div>
+      This is a demo store using the <span className="badge text-bg-secondary">XELIS Pay</span>.<br />
+      Let's pretend this is a portal to buy a new games from an indie game studio.
+    </div>
     <Games />
     <Payments />
     <SupportModal />
