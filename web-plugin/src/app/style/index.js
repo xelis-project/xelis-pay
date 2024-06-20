@@ -1,76 +1,16 @@
-import { css, keyframes } from 'goober'
+import { css } from 'goober'
+import anim from './anim'
 
 // #97ffd8
 
-export const anim = {
-  enter: keyframes`
-    from {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  `,
-  leave: keyframes`
-    from {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(100%);
-    }
-  `,
-  scalePulse: keyframes`
-    0% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(.9);
-      opacity: 0.7;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-  `,
-  opacityPulse: keyframes`
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.7;
-    }
-    100% {
-      opacity: 1;
-    }
-  `,
-  floating: keyframes`
-    0% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-    100% {
-      transform: translateY(0px);
-    }
-  `
-}
+const font = `
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;
+`
 
 export default {
-  backdrop: css`
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgb(0 0 0 / 50%);
-  `,
   layout: css`
+    ${font}
     position: fixed;
     width: 100%;
     top: 0;
@@ -82,10 +22,25 @@ export default {
     display: flex;
     align-items: start;
     justify-content: center;
+    font-size: 16px;
+
+    button, input, optgroup, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      line-height: inherit;
+    }
 
     @media only screen and (min-height: 650px) {
       align-items: center;
     }
+  `,
+  backdrop: css`
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgb(0 0 0 / 50%);
   `,
   app: css`
     /*background-color: #7afad3;*/

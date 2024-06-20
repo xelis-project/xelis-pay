@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XELIS Pay - Example</title>
+</head>
+
+<body>
+  <button id="open_button" type="button">
+    open
+  </button>
+  <div id="xelis_pay"></div>
+  <script type="module">
+    import XELISPay from '../dist/universal/index.min.mjs'
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const root = document.getElementById('xelis_pay')
+      XELISPay.render(root)
+    })
+
+    document.getElementById('open_button').addEventListener('click', () => {
+      XELISPay.startTransfer({ amount: 10 })
+    })
+  </script>
+</body>
