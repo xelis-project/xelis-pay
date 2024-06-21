@@ -6,8 +6,11 @@ import { XelisPayProvider, useXelisPay } from '../provider'
 const START_TRANSFER_EVENT = `xelis_pay_start_transfer`
 const CANCEL_TRANSFER_EVENT = `xelis_pay_cancel_transfer`
 
+const ON_SUPPORT_EVENT = `xelis_pay_on_support`
+const ON_COMPLETE_EVENT = `xelis_pay_on_complete`
+
 const HandleEvents = () => {
-  const { startTransfer, cancelTransfer } = useXelisPay()
+  const { startTransfer, cancelTransfer, onComplete, completeData, onSupport } = useXelisPay()
 
   useEffect(() => {
     const handleStartStransfer = (event) => {
@@ -26,6 +29,20 @@ const HandleEvents = () => {
       document.removeEventListener(CANCEL_TRANSFER_EVENT, handleCancelTransfer)
     }
   }, [])
+
+  useEffect(() => {
+    if (!onComplete) return
+
+    const onCompleteEvent = new CustomEvent(ON_COMPLETE_EVENT, { detail: completeData })
+    document.dispatchEvent(onCompleteEvent)
+  }, [onComplete, completeData])
+
+  useEffect(() => {
+    if (!onSupport) return
+
+    const onSupportEvent = new CustomEvent(ON_SUPPORT_EVENT)
+    document.dispatchEvent(onSupportEvent)
+  }, [onSupport])
 
   return null
 }
@@ -50,4 +67,16 @@ export const cancelTransfer = () => {
   document.dispatchEvent(cancelTransferEvent)
 }
 
-export default { render, startTransfer }
+export const onComplete = (cb) => {
+  document.addEventListener(ON_COMPLETE_EVENT, (event) => {
+    cb(event.detail)
+  })
+}
+
+export const onSupport = (cb) => {
+  document.addEventListener(ON_SUPPORT_EVENT, (event) => {
+    cb()
+  })
+}
+
+export default { render, startTransfer, cancelTransfer, onComplete, onSupport }

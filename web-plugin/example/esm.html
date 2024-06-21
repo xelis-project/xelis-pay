@@ -12,15 +12,24 @@
   </button>
   <div id="xelis_pay"></div>
   <script type="module">
-    import XELISPay from '../dist/universal/index.min.mjs'
+    import XELISPay from '../dist/universal/index.mjs'
 
     document.addEventListener('DOMContentLoaded', async () => {
       const root = document.getElementById('xelis_pay')
       XELISPay.render(root)
+
+      XELISPay.onSupport(() => {
+        // redirect to support page or show a modal with inputs
+        window.alert("This is a support msg.")
+      })
+
+      XELISPay.onComplete((data) => {
+        window.alert(`Payment was successful. The payment data is ${JSON.stringify(data)}`)
+      })
     })
 
     document.getElementById('open_button').addEventListener('click', () => {
-      XELISPay.startTransfer({ amount: 10 })
+      XELISPay.startTransfer({ product_id: `mystic_quest` })
     })
   </script>
 </body>

@@ -11,16 +11,25 @@
     open
   </button>
   <div id="xelis_pay"></div>
-  <script src="../dist/universal/index.min.js"></script>
+  <script src="../dist/universal/index.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       console.log(XELISPay)
       const root = document.getElementById('xelis_pay')
       XELISPay.render(root)
+
+      XELISPay.onSupport(() => {
+        // redirect to support page or show a modal with inputs
+        window.alert("This is a support msg.")
+      })
+
+      XELISPay.onComplete((data) => {
+        window.alert(`Payment was successful. The payment data is ${JSON.stringify(data)}`)
+      })
     })
 
     function openTransfer() {
-      XELISPay.startTransfer({ amount: 10 })
+      XELISPay.startTransfer({ product_id: `mystic_quest` })
     }
   </script>
 </body>

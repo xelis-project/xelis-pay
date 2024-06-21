@@ -1,9 +1,12 @@
 {
   "scripts": {
-    "build-pkg": "esbuild ./src/provider --external:react --loader:.js=jsx --bundle --minify --outfile=./dist/react/index.js",
-    "build-universal-esm": "esbuild ./src/universal --format=esm --loader:.js=jsx --minify  --bundle --outfile=./dist/universal/index.min.mjs",
-    "build-universal": "esbuild ./src/universal --format=iife --global-name=XELISPay --loader:.js=jsx --minify  --bundle --outfile=./dist/universal/index.min.js",
-    "build": "npm run build-pkg && npm run build-universal-esm && npm run build-universal",
+    "build-pkg": "esbuild ./src/provider --external:react --loader:.js=jsx --bundle --outfile=./dist/react/index.js",
+    "build-universal-esm": "esbuild ./src/universal --format=esm --loader:.js=jsx --bundle --outfile=./dist/universal/index.mjs",
+    "build-universal": "esbuild ./src/universal --format=iife --global-name=XELISPay --loader:.js=jsx --bundle --outfile=./dist/universal/index.js",
+    "build-pkg-min": "esbuild ./src/provider --external:react --loader:.js=jsx --bundle --minify --outfile=./dist/react/index.min.js",
+    "build-universal-esm-min": "esbuild ./src/universal --format=esm --loader:.js=jsx --minify --bundle --outfile=./dist/universal/index.min.mjs",
+    "build-universal-min": "esbuild ./src/universal --format=iife --global-name=XELISPay --loader:.js=jsx --minify --bundle --outfile=./dist/universal/index.min.js",
+    "build": "npm run build-pkg && npm run build-universal-esm && npm run build-universal && npm run build-pkg-min && npm run build-universal-esm-min && npm run build-universal-min",
     "test-example": "http-server"
   },
   "dependencies": {

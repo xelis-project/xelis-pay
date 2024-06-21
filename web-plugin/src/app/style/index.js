@@ -220,6 +220,7 @@ export default {
         background: rgb(0 0 0 / 60%);
         padding: 1em;
         backdrop-filter: blur(5px);
+        align-items: center;
       `,
       title: css`
         font-size: 1.2em;
@@ -231,6 +232,7 @@ export default {
         color: white;
         width: 25px;
         height: 25px;
+        cursor: pointer;
 
         &:hover {
           transform: scale(.95);

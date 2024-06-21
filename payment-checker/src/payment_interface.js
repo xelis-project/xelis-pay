@@ -1,5 +1,5 @@
 async function storeApi(endpoint, params) {
-  const res = await fetch(`http://localhost:48766${endpoint}`, {
+  const res = await fetch(`http://localhost:3000${endpoint}`, {
     method: `POST`,
     body: JSON.stringify(params),
     headers: {
